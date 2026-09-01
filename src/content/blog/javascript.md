@@ -1,6 +1,6 @@
 ---
 title: "前端工程師的知識地圖: 從 JavaScript 開始 #1"
-description: "JavaScript 的單執行緒特性決定了它必須透過 Event Loop 機制來實現非同步操作。Event Loop 是瀏覽器和 JavaScript 引擎之間的協調者，它允許程式在等待耗時操作（如網路請求、檔案讀取）時，不會原地阻塞，而是先去執行其他任務，待操作完成後再回來處理結果。本章將深入探討 Event Loop 的運作原理，包括 Task 和 Microtask 的執行順序、Agent 和 Realm 的概念，以及如何透過理解 Event Loop 來寫出更高效的非同步程式碼。"
+description: "JavaScript 筆記"
 pubDate: "Sep 01 2026"
 heroImage: ""
 ---
@@ -19,7 +19,7 @@ heroImage: ""
 
 #### The engine and the host
 
-![1788236781312](image/first-post/1788236781312.png)
+![1788236781312](image/javascript/1788236781312.png)
 
 JavaScript 的執行有**兩大必要條件**：JavaScript engine 和 host environment
 
@@ -32,7 +32,7 @@ JavaScript 的執行有**兩大必要條件**：JavaScript engine 和 host envir
 
 #### Agent Execution Model
 
-![1788236788573](image/first-post/1788236788573.png)
+![1788236788573](image/javascript/1788236788573.png)
 
 ```
 Browser = 整座工廠
@@ -208,7 +208,7 @@ g.next()
 
 [Event loop: microtasks and macrotasks](https://javascript.info/event-loop)
 
-![1788236801703](image/first-post/1788236801703.png)
+![1788236801703](image/javascript/1788236801703.png)
 
 ##### 一個 Event Loop
 
@@ -246,7 +246,7 @@ Task = Macro task
 
   因為 `.then` 每次都會回傳新的 Promise
 
-	![1788236811563](image/first-post/1788236811563.png)
+	![1788236811563](image/javascript/1788236811563.png)
 
 - `async/await` **建立在 Promise 機制之上**
   - `async` 一定會回傳一個 **Promise**，讓程式更清晰易讀
