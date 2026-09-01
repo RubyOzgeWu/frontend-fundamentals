@@ -1,0 +1,103 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+	headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+---
+
+{
+	toc.length > 0 && (
+		<nav class="toc" aria-label="文章目錄">
+			<p class="toc-title">目錄</p>
+			<ul>
+				{toc.map((heading) => (
+					<li class={`depth-${heading.depth}`}>
+						<a href={`#${heading.slug}`} data-slug={heading.slug}>
+							{heading.text}
+						</a>
+					</li>
+				))}
+			</ul>
+		</nav>
+	)
+}
+
+<style>
+	.toc {
+		font-size: 0.9rem;
+	}
+	.toc-title {
+		margin: 0 0 0.75em 0;
+		font-weight: 700;
+		color: rgb(var(--black));
+	}
+	.toc ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-left: 2px solid rgb(var(--gray-light));
+	}
+	.toc li {
+		margin: 0;
+	}
+	.toc a {
+		display: block;
+		padding: 0.3em 0 0.3em 0.9em;
+		margin-left: -2px;
+		border-left: 2px solid transparent;
+		color: rgb(var(--gray));
+		text-decoration: none;
+		line-height: 1.4;
+	}
+	.toc a:hover {
+		color: var(--accent);
+	}
+	.toc a.active {
+		color: var(--accent);
+		border-left-color: var(--accent);
+		font-weight: 700;
+	}
+	.toc li.depth-3 a {
+		padding-left: 1.7em;
+	}
+	.toc li.depth-4 a {
+		padding-left: 2.5em;
+		font-size: 0.92em;
+	}
+</style>
+
+<script>
+	function setupToc() {
+		const links = document.querySelectorAll<HTMLAnchorElement>('.toc a[data-slug]');
+		if (links.length === 0) return;
+
+		const headingEls = Array.from(links)
+			.map((link) => document.getElementById(link.dataset.slug ?? ''))
+			.filter((el): el is HTMLElement => el !== null);
+
+		const setActive = (slug: string) => {
+			links.forEach((link) => {
+				link.classList.toggle('active', link.dataset.slug === slug);
+			});
+		};
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				const visible = entries.filter((entry) => entry.isIntersecting);
+				if (visible.length > 0) {
+					setActive(visible[0].target.id);
+				}
+			},
+			{ rootMargin: '0px 0px -70% 0px', threshold: 1.0 },
+		);
+
+		headingEls.forEach((el) => observer.observe(el));
+	}
+
+	setupToc();
+	document.addEventListener('astro:after-swap', setupToc);
+</script>

@@ -1,14 +1,16 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<'blog'>['data'] & { headings?: MarkdownHeading[] };
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, headings = [] } = Astro.props;
 ---
 
 <html lang="en">
@@ -29,12 +31,30 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				border-radius: 12px;
 				box-shadow: var(--box-shadow);
 			}
+			.post-layout {
+				display: flex;
+				justify-content: center;
+				align-items: flex-start;
+				gap: 3em;
+			}
 			.prose {
-				width: 720px;
+				width: 1024px;
 				max-width: calc(100% - 2em);
-				margin: auto;
 				padding: 1em;
 				color: rgb(var(--gray-dark));
+			}
+			.toc-wrapper {
+				display: none;
+				position: sticky;
+				top: 2em;
+				width: 220px;
+				flex-shrink: 0;
+				padding-top: 1em;
+			}
+			@media (min-width: 1350px) {
+				.toc-wrapper {
+					display: block;
+				}
 			}
 			.title {
 				margin-bottom: 1em;
@@ -62,22 +82,31 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				<div class="hero-image">
 					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
 				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
+				<div class="post-layout">
+					<div class="prose">
+						<div class="title">
+							<div class="date">
+								<FormattedDate date={pubDate} />
+								{
+									updatedDate && (
+										<div class="last-updated-on">
+											Last updated on <FormattedDate date={updatedDate} />
+										</div>
+									)
+								}
+							</div>
+							<h1>{title}</h1>
+							<hr />
 						</div>
-						<h1>{title}</h1>
-						<hr />
+						<slot />
 					</div>
-					<slot />
+					{
+						headings.length > 0 && (
+							<aside class="toc-wrapper">
+								<TableOfContents headings={headings} />
+							</aside>
+						)
+					}
 				</div>
 			</article>
 		</main>
