@@ -316,3 +316,21 @@ tooltip.style.transform =
   opacity: 1;
 }
 ```
+---
+## Vue 實務應用
+
+| **Vue / Nuxt 寫法**                    | **為什麼有成本**                                                      | **簡單示範**                    |
+| ------------------------------------ | --------------------------------------------------------------- | --------------------------- |
+| `v-if` 切換大型 subtree                  | 會真的 insert / remove DOM；::大量節點可能伴隨 Style / Layout / Paint::     | 大區塊頻繁切換時成本高                 |
+| `v-show`                             | DOM 不移除，只切 `display`；仍::可能造成 Layout / Paint::                   | 適合頻繁顯示/隱藏                   |
+| Transition 動畫 `height`               | `height` 是 layout property，動畫每 frame 都可能重算 Layout               | 優先考慮 `transform`            |
+| `watch` 後讀 `getBoundingClientRect()` | Vue patch DOM 後，如果 layout dirty，讀 geometry 可能 ::forced layout:: | 注意 measure / mutate 分離      |
+| 大量 reactive updates                  | Vue 雖然會 batching，但仍可能最後 patch 很多 DOM                            | 避免不必要 reactive dependency   |
+| 長列表 `v-for`                          | 建立大量 DOM，Style / Layout 成本都會上升                                  | pagination / virtualization |
+
+### v-if / v-show
+
+- 偶爾切換 → `v-if`
+- 頻繁切換 → `v-show`
+
+---
