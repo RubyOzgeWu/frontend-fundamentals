@@ -2,6 +2,7 @@
 title: "前端工程師的知識地圖: 進階一點點的 TypeScript #2"
 description: "TypeScript 筆記"
 pubDate: "Sep 01 2026"
+order: 2
 heroImage: ""
 ---
 

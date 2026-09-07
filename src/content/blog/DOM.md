@@ -2,6 +2,7 @@
 title: "前端工程師的知識地圖: 了解瀏覽器的運作-認識 DOM 開始 #3"
 description: "DOM 筆記"
 pubDate: "Sep 01 2026"
+order: 3
 heroImage: ""
 ---
 DOM 是瀏覽器將文件轉換成可被程式操作的 **<mark>物件樹 (由物件和節點 node 組成)</mark>**，使 JavaScript 能讀取、修改網頁，以及處理使用者事件。

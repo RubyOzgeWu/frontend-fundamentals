@@ -2,6 +2,7 @@
 title: "前端工程師的知識地圖: 從 JavaScript 開始 #1"
 description: "JavaScript 筆記"
 pubDate: "Sep 01 2026"
+order: 1
 heroImage: ""
 ---
 ## Event Loop
