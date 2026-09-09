@@ -9,7 +9,7 @@ DOM 是瀏覽器將文件轉換成可被程式操作的 **<mark>物件樹 (由�
 
 ---
 
-## 	Concept and Usage
+## Concept and Usage
 
 - 所有網頁上<mark>可操作的屬性、方法、事件</mark>都是 **<mark>"物件"</mark>**
 - <mark>多個 API</mark> 協作形成 DOM，例如: Core DOM, Web API

@@ -1,14 +1,13 @@
 ---
-title: "前端工程師的知識地圖: 認識瀏覽器的運作-渲染效能優化 #5"
+title: "前端工程師的知識地圖: 了解瀏覽器的運作-渲染效能優化 #4"
 description: "Rendering Performance 筆記"
 pubDate: "Sep 01 2026"
 order: 4
 heroImage: ""
 ---
-
-| 主題                 | 學習重點                                                                    | 目標                          | 驗收標準                                                                        |
-| ------------------ | ----------------------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------- |
-| Rendering Pipeline | HTML → DOM、CSS → CSSOM、Render Tree、Layout、Paint、Composite               | 理解「程式碼改動」最後如何變成螢幕畫面         | 能完整說明從 HTML/CSS 到畫面顯示流程；看到效能問題時能判斷可能卡在哪一階段                                  |
+| 主題               | 學習重點                                                                   | 目標                                          | 驗收標準                                                                                        |
+| ------------------ | -------------------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Rendering Pipeline | HTML → DOM、CSS → CSSOM、Render Tree、Layout、Paint、Composite           | 理解「程式碼改動」最後如何變成螢幕畫面        | 能完整說明從 HTML/CSS 到畫面顯示流程；看到效能問題時能判斷可能卡在哪一階段                      |
 | Reflow / Repaint   | Layout trigger、Paint trigger、Composite-only properties、layout thrashing | 知道哪些 DOM/CSS 操作成本高，能避免低效能更新 | 能解釋改 width、background、transform 成本差異；知道為何 animation 常優先使用 transform/opacity |
 
 ## Rendering
@@ -109,12 +108,12 @@ visibility
 
 - deadline 導致 **dropped frames / jank** 的原因
 
-| 改動                         | 可能重新 Style | Layout | Paint | Composite | 直覺                                     |
-| -------------------------- | ---------- | ------ | ----- | --------- | -------------------------------------- |
-| width: 100px → 200px       | 是          | 是      | 是     | 是         | box 變大，其他元素位置也可能跟著變。                   |
-| background-color           | 是          | 通常否    | 是     | 是         | 幾何不變，但像素外觀變了。                          |
-| transform: translateX(...) | 是          | 通常否    | 通常可避免 | 是         | 移動已存在的視覺 layer，而不是重新排版。                |
-| opacity                    | 是          | 否      | 常可避免  | 是         | 調整 layer 透明度；是否獨立 compositing 仍依瀏覽器決策。 |
+| 改動                       | 可能重新 Style | Layout | Paint      | Composite | 直覺                                                     |
+| -------------------------- | -------------- | ------ | ---------- | --------- | -------------------------------------------------------- |
+| width: 100px → 200px      | 是             | 是     | 是         | 是        | box 變大，其他元素位置也可能跟著變。                     |
+| background-color           | 是             | 通常否 | 是         | 是        | 幾何不變，但像素外觀變了。                               |
+| transform: translateX(...) | 是             | 通常否 | 通常可避免 | 是        | 移動已存在的視覺 layer，而不是重新排版。                 |
+| opacity                    | 是             | 否     | 常可避免   | 是        | 調整 layer 透明度；是否獨立 compositing 仍依瀏覽器決策。 |
 
 ---
 
@@ -130,7 +129,7 @@ box.style.width = "400px";  // Write layout 更動
 console.log(box.offsetWidth);  // 馬上就要 Read 計算結果
 ```
 
-  - **迫使瀏覽器馬上更動和計算** ⇒ 影響效能及流暢度 (主執行緒被卡住) ⇒ **dropped frames / jank**
+- **迫使瀏覽器馬上更動和計算** ⇒ 影響效能及流暢度 (主執行緒被卡住) ⇒ **dropped frames / jank**
 
 ### Layout Thrashing
 
@@ -141,16 +140,16 @@ console.log(box.offsetWidth);  // 馬上就要 Read 計算結果
 
 ## 實務應用
 
-| 情境                            | 常見問題                         | 建議思路                                                                            |
-| ----------------------------- | ---------------------------- | ------------------------------------------------------------------------------- |
-| 展開 / 收合 sidebar               | 動畫 width 造成每 frame layout    | 若設計允許，考慮 transform: translate；或降低動畫範圍。                                          |
-| 大型 table / list               | DOM 太大，layout / style 成本上升   | pagination、virtualization、content-visibility 等策略。                               |
-| drag / resize                 | pointermove 每次讀 / 寫 geometry | requestAnimationFrame throttle；reads / writes 分批；transform 做位移。                 |
-| sticky header / scroll effect | scroll handler 高頻 DOM 操作     | 避免同步 layout read / write；可用 IntersectionObserver / requestAnimationFrame，視需求使用。 |
-| tooltip / popover 定位          | 先改 DOM 再量測位置                 | 明確安排 measure → mutate，減少多次 getBoundingClientRect()。                             |
-| 圖片載入後跳動                       | 圖片尺寸未知，內容重新排版                | 預留 width / height 或 aspect-ratio，降低 layout shift。                               |
-| loading skeleton              | 大量 shimmer / 陰影 repaint      | 控制動畫面積與 property；避免全頁高頻 paint。                                                  |
-| modal transition              | top / left / width 動畫        | 通常使用 transform + opacity，並量測 layer / paint。                                     |
+| 情境                          | 常見問題                          | 建議思路                                                                                      |
+| ----------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------- |
+| 展開 / 收合 sidebar           | 動畫 width 造成每 frame layout    | 若設計允許，考慮 transform: translate；或降低動畫範圍。                                       |
+| 大型 table / list             | DOM 太大，layout / style 成本上升 | pagination、virtualization、content-visibility 等策略。                                       |
+| drag / resize                 | pointermove 每次讀 / 寫 geometry  | requestAnimationFrame throttle；reads / writes 分批；transform 做位移。                       |
+| sticky header / scroll effect | scroll handler 高頻 DOM 操作      | 避免同步 layout read / write；可用 IntersectionObserver / requestAnimationFrame，視需求使用。 |
+| tooltip / popover 定位        | 先改 DOM 再量測位置               | 明確安排 measure → mutate，減少多次 getBoundingClientRect()。                                |
+| 圖片載入後跳動                | 圖片尺寸未知，內容重新排版        | 預留 width / height 或 aspect-ratio，降低 layout shift。                                      |
+| loading skeleton              | 大量 shimmer / 陰影 repaint       | 控制動畫面積與 property；避免全頁高頻 paint。                                                 |
+| modal transition              | top / left / width 動畫           | 通常使用 transform + opacity，並量測 layer / paint。                                          |
 
 ### 1. Sidebar
 
@@ -317,17 +316,19 @@ tooltip.style.transform =
   opacity: 1;
 }
 ```
+
 ---
+
 ## Vue 實務應用
 
-| **Vue / Nuxt 寫法**                    | **為什麼有成本**                                                      | **簡單示範**                    |
-| ------------------------------------ | --------------------------------------------------------------- | --------------------------- |
-| `v-if` 切換大型 subtree                  | 會真的 insert / remove DOM；::大量節點可能伴隨 Style / Layout / Paint::     | 大區塊頻繁切換時成本高                 |
-| `v-show`                             | DOM 不移除，只切 `display`；仍::可能造成 Layout / Paint::                   | 適合頻繁顯示/隱藏                   |
-| Transition 動畫 `height`               | `height` 是 layout property，動畫每 frame 都可能重算 Layout               | 優先考慮 `transform`            |
-| `watch` 後讀 `getBoundingClientRect()` | Vue patch DOM 後，如果 layout dirty，讀 geometry 可能 ::forced layout:: | 注意 measure / mutate 分離      |
-| 大量 reactive updates                  | Vue 雖然會 batching，但仍可能最後 patch 很多 DOM                            | 避免不必要 reactive dependency   |
-| 長列表 `v-for`                          | 建立大量 DOM，Style / Layout 成本都會上升                                  | pagination / virtualization |
+| **Vue / Nuxt 寫法**                  | **為什麼有成本**                                                  | **簡單示範**             |
+| ------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------ |
+| `v-if` 切換大型 subtree                  | 會真的 insert / remove DOM；::大量節點可能伴隨 Style / Layout / Paint:: | 大區塊頻繁切換時成本高         |
+| `v-show`                                 | DOM 不移除，只切`display`；仍::可能造成 Layout / Paint::              | 適合頻繁顯示/隱藏              |
+| Transition 動畫`height`                  | `height` 是 layout property，動畫每 frame 都可能重算 Layout           | 優先考慮`transform`          |
+| `watch` 後讀 `getBoundingClientRect()` | Vue patch DOM 後，如果 layout dirty，讀 geometry 可能 ::forced layout:: | 注意 measure / mutate 分離     |
+| 大量 reactive updates                      | Vue 雖然會 batching，但仍可能最後 patch 很多 DOM                        | 避免不必要 reactive dependency |
+| 長列表`v-for`                            | 建立大量 DOM，Style / Layout 成本都會上升                               | pagination / virtualization    |
 
 ### v-if / v-show
 
